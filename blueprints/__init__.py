@@ -10,17 +10,17 @@ from functools import wraps
 import json, random, string, os
 
 
-app = Flask(__name__) # membuat semua blueprint
+app = Flask(__name__) # create all blueprints
 app.config["APP_DEBUG"] = True
 CORS(app)
 
 
-kunci_lokesal = os.environ["INI_KUNCI_LOKESAL"]
-uname = os.environ["INI_UNAME"]
-pwd = os.environ["INI_PWD"]
-db_test = os.environ["INI_DB_TEST"]
-db_dev = os.environ["INI_DB_DEV"]
-db_endpoint = os.environ["INI_DB_ENDPOINT"]
+secret_key = os.environ["THIS_SECRET_KEY"]
+uname = os.environ["THIS_UNAME"]
+pwd = os.environ["THIS_PWD"]
+db_test = os.environ["THIS_DB_TEST"]
+db_dev = os.environ["THIS_DB_DEV"]
+db_endpoint = os.environ["THIS_DB_ENDPOINT"]
 
 try:
     env = os.environ.get("FLASK_ENV", "development")
@@ -32,7 +32,7 @@ except Exception as error:
     raise error
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["JWT_SECRET_KEY"] = kunci_lokesal
+app.config["JWT_SECRET_KEY"] = secret_key
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=365)
 
 
