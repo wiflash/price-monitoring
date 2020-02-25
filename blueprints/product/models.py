@@ -39,6 +39,7 @@ class Product(db.Model):
     name = db.Column(db.String(100), nullable=False, default="")
     parent_product = relationship("Product", back_populates="products")
     price = relationship("Price", back_populates="products")
+    product_photo = relationship("ProductPhoto", back_populates="products")
 
     response = {
         "id": fields.Integer,
@@ -55,3 +56,24 @@ class Product(db.Model):
 
     def __repr__(self):
         return "<Product %r>" % self.id
+
+
+class ProductPhoto(db.Model):
+    __tablename__ = "product_photos"
+    id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
+    product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
+    source = db.Column(db.String(1000), nullable=False, default="")
+    product = relationship("Product", back_populates="product_photos")
+
+    response = {
+        "id": fields.Integer,
+        "product_id": fields.Integer,
+        "source": fields.String
+    }
+
+    def __init__(self, product_id, source):
+        self.product_id = product_id
+        self.source = source
+
+    def __repr__(self):
+        return "<ProductPhoto %r>" % self.id
