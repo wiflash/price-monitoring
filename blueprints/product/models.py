@@ -6,12 +6,29 @@ from datetime import datetime
 
 class Price(db.Model):
     __tablename__ = "prices"
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    parent_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=True)
+    id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
+    product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
     actual_price = db.Column(db.Integer, nullable=False, default=0)
     sale_price = db.Column(db.Integer, nullable=False, default=0)
     created = db.Column(db.DateTime, nullable=False)
     product = relationship("Product", back_populates="prices")
+
+    response = {
+        "created": fields.DateTime(dt_format="iso8601"),
+        "id": fields.Integer,
+        "product_id": fields.Integer,
+        "actual_price": fields.Integer,
+        "sale_price": fields.Integer
+    }
+
+    def __init__(self, product_id, actual_price, sale_price):
+        self.product_id = product_id
+        self.actual_price = actual_price
+        self.sale_price = sale_price
+        self.created = datetime.now()
+    
+    def __repr__(self):
+        return "<Price %r>" % self.id
 
 
 class Product(db.Model):
