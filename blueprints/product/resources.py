@@ -126,7 +126,8 @@ class AddProduct(Resource):
                     db.session.commit()
                     return {
                         "status": "SUCCESS",
-                        "message": "Product is successfully recorded."
+                        "message": "Product is successfully recorded.",
+                        "product_parent_id": int(product_id)
                     }, 200, {"Content-Type": "application/json"}
                 return {
                     "status": "NOT_FOUND",
@@ -252,7 +253,7 @@ class ShowProductDetail(Resource):
             pass
         return {
             "status": "NOT_FOUND",
-            "message": "Products ID is not found."
+            "message": "Product ID is not found."
         }, 404, {"Content-Type": "application/json"}
 
     def options(self, id=None):
