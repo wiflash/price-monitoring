@@ -141,5 +141,8 @@ class AddProduct(Resource):
             "message": "Product link cannot be empty."
         }, 400, {"Content-Type": "application/json"}
 
+    def options(self):
+        return 200
+
 
 api.add_resource(AddProduct, "/add_product")
