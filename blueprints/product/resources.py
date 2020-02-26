@@ -162,8 +162,23 @@ class ShowProducts(Resource):
         parser.add_argument("per_page", type=int, location="args", default=10)
         args = parser.parse_args()
 
-        # limit shown products per page
         product_query = Product.query.filter_by(parent_id=None)
+        # order result
+        if args["order"] is not None:
+            # order product by name
+            if args["order"] == "name":
+                if args["sort"] == "desc" or args["sort"] == "":
+                    product_query = product_query.order_by(Product.name.desc())
+                elif args["sort"] == "asc":
+                    product_query = product_query.order_by(Product.name.asc())
+            # order product by date created
+            elif args["order"] == "created" or args["order"] == "":
+                if args["sort"] == "desc" or args["sort"] == "":
+                    product_query = product_query.order_by(Product.created.desc())
+                elif args["sort"] == "asc":
+                    product_query = product_query.order_by(Product.created.asc())
+        
+        # limit shown products per page
         product_total = len(product_query.all())
         offset = (args["page"] - 1)*args["per_page"]
         product_query = product_query.limit(args["per_page"]).offset(offset)
