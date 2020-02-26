@@ -4,7 +4,6 @@ from flask_restful import Resource, Api, reqparse
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
-from flask_jwt_extended import JWTManager, verify_jwt_in_request, get_jwt_claims
 from datetime import timedelta
 from functools import wraps
 import json, random, string, os
@@ -32,15 +31,12 @@ except Exception as error:
     raise error
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["JWT_SECRET_KEY"] = secret_key
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=365)
 
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
-jwt = JWTManager(app)
 
 
 @app.after_request

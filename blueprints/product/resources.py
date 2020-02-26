@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask_restful import Api, Resource, reqparse, marshal
 from blueprints import db
-from blueprints.product.models import Product, Price, Photo, Description, Category
+from blueprints.product.models import Product, Price, Photo, Description
 from datetime import datetime
 from bs4 import BeautifulSoup
 import requests, re, json
