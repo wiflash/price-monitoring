@@ -246,6 +246,20 @@ class UpdatePrice(Resource):
         return 200
 
 
+class ShowProductDetail(Resource):
+    def get(self, id=None):
+        if id is not None:
+            pass
+        return {
+            "status": "NOT_FOUND",
+            "message": "Products ID is not found."
+        }, 404, {"Content-Type": "application/json"}
+
+    def options(self, id=None):
+        return 200
+
+
 api.add_resource(AddProduct, "/add_product")
 api.add_resource(ShowProducts, "/show_products")
 api.add_resource(UpdatePrice, "/update_price")
+api.add_resource(ShowProductDetail, "/product_detail/<int:id>")
