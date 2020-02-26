@@ -18,9 +18,9 @@ class AddProduct(Resource):
         args = parser.parse_args()
 
         # scrap product details only if input is not empty
-        if args["product_link"] is not None:
+        if args["product_link"]:
             end_index = args["product_link"].find("html")+4
-            if end_index == -1:
+            if end_index == 3:
                 return {
                     "status": "FAILED",
                     "message": "Incorrect Fabelio product link address."
@@ -30,6 +30,12 @@ class AddProduct(Resource):
             
             # check if response is OK
             if product_response.status_code == 200:
+                # check if product link is already exist
+                if Description.query.filter_by(link=product_link).all():
+                    return {
+                        "status": "FAILED",
+                        "message": "Product link already exists."
+                    }, 400, {"Content-Type": "application/json"}
                 soup = BeautifulSoup(product_response.text, "html.parser")
                 scrap_product_description = soup.find(id="description")
                 if scrap_product_description is not None:
@@ -37,7 +43,8 @@ class AddProduct(Resource):
                     # add new description to db session
                     new_description = Description(product_description, product_link)
                     db.session.add(new_description)
-                    
+                    db.session.commit()
+
                     # scrap base product
                     scrap_product = soup.find(id="product-ratings")
                     if scrap_product is not None:
@@ -84,7 +91,7 @@ class AddProduct(Resource):
                             variants = variants_data["jsonConfig"]["attributes"][special_num]["options"]
                             for variant in variants:
                                 if variant["products"] != []:
-                                    variant_id = variant["products"]
+                                    variant_id = variant["products"][0]
                                     variant_info_response = requests.get("https://fabelio.com/insider/data/product/id/"+str(variant_id))
                                     variant_info_json = variant_info_response.json()
                                     db.session.add(
@@ -116,6 +123,7 @@ class AddProduct(Resource):
                                                 source=variant_photo["large"]
                                             )
                                         )
+                    db.session.commit()
                     return {
                         "status": "SUCCESS",
                         "message": "Product is successfully recorded."

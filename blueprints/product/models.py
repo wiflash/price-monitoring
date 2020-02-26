@@ -11,7 +11,7 @@ class Price(db.Model):
     unit_price = db.Column(db.Integer, nullable=False, default=0)
     unit_sale_price = db.Column(db.Integer, nullable=False, default=0)
     created = db.Column(db.DateTime, nullable=False)
-    product = relationship("Product", back_populates="prices")
+    product = relationship("Product", back_populates="price")
 
     response = {
         "created": fields.DateTime(dt_format="iso8601"),
@@ -34,9 +34,9 @@ class Price(db.Model):
 class Description(db.Model):
     __tablename__ = "descriptions"
     id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
-    content = db.Column(db.String(1000), nullable=False, default="")
+    content = db.Column(db.String(5000), nullable=False, default="")
     link = db.Column(db.String(100), nullable=False, default="")
-    product = relationship("Product", back_populates="descriptions")
+    product = relationship("Product", back_populates="description")
 
     response = {
         "id": fields.Integer,
@@ -58,10 +58,10 @@ class Product(db.Model):
     parent_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=True)
     description_id = db.Column(db.Integer, db.ForeignKey("descriptions.id"), nullable=False)
     name = db.Column(db.String(100), nullable=False, default="")
-    product_parent = relationship("Product", back_populates="products")
-    description = relationship("Description", back_populates="products")
-    price = relationship("Price", back_populates="products")
-    photo = relationship("Photo", back_populates="products")
+    product_parent = relationship("Product", remote_side=[id])
+    description = relationship("Description", back_populates="product")
+    price = relationship("Price", back_populates="product")
+    photo = relationship("Photo", back_populates="product")
 
     response = {
         "id": fields.Integer,
@@ -85,7 +85,7 @@ class Photo(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
     source = db.Column(db.String(1000), nullable=False, default="")
-    product = relationship("Product", back_populates="photos")
+    product = relationship("Product", back_populates="photo")
 
     response = {
         "id": fields.Integer,
