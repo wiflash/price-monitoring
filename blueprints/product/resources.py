@@ -141,5 +141,67 @@ class AddProduct(Resource):
             "message": "Product link cannot be empty."
         }, 400, {"Content-Type": "application/json"}
 
+    def options(self):
+        return 200
+
+
+class ShowProducts(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument(
+            "order", location="args", default="created",
+            choices=("created", "name", ""),
+            help="Input must be 'created' or 'name'"
+        )
+        parser.add_argument(
+            "sort", location="args", default="desc",
+            choices=("asc", "desc", ""),
+            help="Input must be 'asc' or 'desc'"
+        )
+        parser.add_argument("page", type=int, location="args", default=1)
+        parser.add_argument("per_page", type=int, location="args", default=10)
+        args = parser.parse_args()
+
+        product_query = Product.query.filter_by(parent_id=None)
+        # order result
+        if args["order"] is not None:
+            # order product by name
+            if args["order"] == "name":
+                if args["sort"] == "desc" or args["sort"] == "":
+                    product_query = product_query.order_by(Product.name.desc())
+                elif args["sort"] == "asc":
+                    product_query = product_query.order_by(Product.name.asc())
+            # order product by date created
+            elif args["order"] == "created" or args["order"] == "":
+                if args["sort"] == "desc" or args["sort"] == "":
+                    product_query = product_query.order_by(Product.created.desc())
+                elif args["sort"] == "asc":
+                    product_query = product_query.order_by(Product.created.asc())
+        
+        # limit shown products per page
+        product_total = len(product_query.all())
+        offset = (args["page"] - 1)*args["per_page"]
+        product_query = product_query.limit(args["per_page"]).offset(offset)
+        if product_total%args["per_page"] != 0 or product_total == 0:
+            page_total = int(product_total/args["per_page"]) + 1
+        else:
+            page_total = int(product_total/args["per_page"])
+        response = {
+            "product_total": product_total, "page":args["page"],
+            "page_total":page_total, "per_page":args["per_page"]
+        }
+
+        all_products = []
+        for each_product in product_query:
+            product_info = marshal(each_product, Product.response)
+            product_info["product_link"] = each_product.description.link
+            all_products.append(product_info)
+        response["all_products"] = all_products
+        return response, 200, {"Content-Type": "application/json"}
+
+    def options(self):
+        return 200
+
 
 api.add_resource(AddProduct, "/add_product")
+api.add_resource(ShowProducts, "/show_products")
