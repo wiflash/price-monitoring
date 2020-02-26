@@ -66,4 +66,6 @@ def after_request(response):
     return response
 
 
+from blueprints.product.resources import product_blueprint
 
+app.register_blueprint(product_blueprint, url_prefix="")
