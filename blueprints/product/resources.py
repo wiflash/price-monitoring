@@ -203,5 +203,19 @@ class ShowProducts(Resource):
         return 200
 
 
+class UpdatePrice(Resource):
+    def put(self):
+        parent_products = Product.query.filter_by(parent_id=None)
+        child_product = Product.query.get(7567)
+        print(child_product.product_parent)
+        print(parent_products.first().product_children)
+        # for each_parent in parent_products.all():
+        #     each_parent
+
+    def options(self):
+        return 200
+
+
 api.add_resource(AddProduct, "/add_product")
 api.add_resource(ShowProducts, "/show_products")
+api.add_resource(UpdatePrice, "/update_price")
