@@ -239,7 +239,7 @@ class UpdatePrice(Resource):
         db.session.commit()
         return {
             "status": "SUCCESS",
-            "message": "Product is successfully updated."
+            "message": "Products are successfully updated."
         }, 200, {"Content-Type": "application/json"}
 
     def options(self):
