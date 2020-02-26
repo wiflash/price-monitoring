@@ -2,7 +2,7 @@ from flask import Blueprint
 from flask_restful import Api, Resource, reqparse, marshal
 from blueprints import db
 from blueprints.product.models import Product, Price, Photo, Description
-from datetime import datetime
+from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 import requests, re, json
 
@@ -203,5 +203,49 @@ class ShowProducts(Resource):
         return 200
 
 
+class UpdatePrice(Resource):
+    def put(self):
+        parent_products = Product.query.filter_by(parent_id=None)
+        for each_parent in parent_products.all():
+            product_children = each_parent.product_children
+            if product_children == []:
+                # check if last updated price is within an hour
+                if each_parent.price[-1].created+timedelta(hours=1) <= datetime.now():
+                    # get new product_parent info
+                    product_parent_info_response = requests.get("https://fabelio.com/insider/data/product/id/"+str(each_parent.id))
+                    product_parent_info_json = product_parent_info_response.json()
+                    # add new product_parent price
+                    product_parent_price = Price(
+                        product_id=each_parent.id,
+                        unit_price=product_parent_info_json["product"]["unit_price"],
+                        unit_sale_price=product_parent_info_json["product"]["unit_sale_price"]
+                    )
+                    db.session.add(product_parent_price)
+            elif product_children != []:
+                for each_child in product_children:
+                    # check if last updated price is within an hour
+                    if each_child.price[-1].created+timedelta(hours=1) <= datetime.now():
+                        variant_id = each_child.id
+                        # get new variant info
+                        variant_info_response = requests.get("https://fabelio.com/insider/data/product/id/"+str(variant_id))
+                        variant_info_json = variant_info_response.json()
+                        # add new variant price
+                        variant_price = Price(
+                            product_id=variant_id,
+                            unit_price=variant_info_json["product"]["unit_price"],
+                            unit_sale_price=variant_info_json["product"]["unit_sale_price"]
+                        )
+                        db.session.add(variant_price)
+        db.session.commit()
+        return {
+            "status": "SUCCESS",
+            "message": "Products are successfully updated."
+        }, 200, {"Content-Type": "application/json"}
+
+    def options(self):
+        return 200
+
+
 api.add_resource(AddProduct, "/add_product")
 api.add_resource(ShowProducts, "/show_products")
+api.add_resource(UpdatePrice, "/update_price")
