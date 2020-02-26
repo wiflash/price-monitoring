@@ -68,7 +68,7 @@ class Product(db.Model):
         "name": fields.String
     }
 
-    def __init__(self, id, parent_id=None, description_id, name):
+    def __init__(self, id, parent_id, description_id, name):
         self.id = id
         self.parent_id = parent_id
         self.description_id = description_id
