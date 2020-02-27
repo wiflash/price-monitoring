@@ -255,8 +255,9 @@ class ShowProductDetail(Resource):
             if product_parent_query is not None:
                 product_data = product_parent_query
                 response = marshal(product_parent_query, Product.response)
-                # get product parent description
-                response["description"] = product_parent_query.description.content
+                # get product description only if it is a product parent
+                if not product_data.parent_id:
+                    response["description"] = product_data.description.content
                 # get product variants if there is any
                 variants = product_parent_query.product_children
                 if variants != []:
