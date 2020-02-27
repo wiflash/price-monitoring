@@ -29,7 +29,6 @@ more-itertools==8.0.2
 packaging==19.2
 password-strength==0.0.3.post2
 pathlib2==2.3.5
-pkg-resources==0.0.0
 pluggy==0.13.1
 py==1.8.0
 PyJWT==1.7.1
