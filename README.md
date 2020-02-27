@@ -3,6 +3,7 @@
 ## API Endpoints
 **API Domain:** 
 > https://wildan-price-monitoring.herokuapp.com/
+
 | Endpoint | Method | Description | Request Parameter | Location |
 |--|:--:|--|:--:|:--:|
 | /add_product | POST | Add new product based on Fabelio product link. | product_link | Body |
