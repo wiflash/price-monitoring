@@ -1,4 +1,4 @@
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from blueprints import db
 from flask_restful import fields
 from datetime import datetime
@@ -63,6 +63,7 @@ class Product(db.Model):
     name = db.Column(db.String(100), nullable=False, default="")
     created = db.Column(db.DateTime, nullable=False)
     product_parent = relationship("Product", remote_side=[id])
+    product_children = relationship("Product", backref=backref("parent", remote_side=[id]))
     description = relationship("Description", back_populates="product")
     price = relationship("Price", back_populates="product")
     photo = relationship("Photo", back_populates="product")
