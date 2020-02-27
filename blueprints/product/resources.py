@@ -250,7 +250,29 @@ class UpdatePrice(Resource):
 class ShowProductDetail(Resource):
     def get(self, id=None):
         if id is not None:
-            pass
+            # get product parent data by ID if exists
+            product_parent_query = Product.query.get(id)
+            if product_parent_query is not None:
+                product_data = product_parent_query
+                response = marshal(product_parent_query, Product.response)
+                # get product parent description
+                response["description"] = product_parent_query.description.content
+                # get product variants if there is any
+                variants = product_parent_query.product_children
+                if variants != []:
+                    response["variants"] = [marshal(each_variant, Product.response) for each_variant in variants]
+                    product_data = variants[0]
+                # get product price history
+                unit_prices_history = []
+                unit_sale_prices_history = []
+                for each_price in product_data.price:
+                    unit_prices_history.append([each_price.unit_price, str(each_price.created)])
+                    unit_sale_prices_history.append([each_price.unit_sale_price, str(each_price.created)])
+                response["unit_prices_history"] = unit_prices_history
+                response["unit_sale_prices_history"] = unit_sale_prices_history
+                # get product gallery
+                response["gallery"] = [each_photo.source for each_photo in product_data.photo]
+                return response, 200, {"Content-Type": "application/json"}
         return {
             "status": "NOT_FOUND",
             "message": "Product ID is not found."
@@ -263,4 +285,4 @@ class ShowProductDetail(Resource):
 api.add_resource(AddProduct, "/add_product")
 api.add_resource(ShowProducts, "/show_products")
 api.add_resource(UpdatePrice, "/update_price")
-api.add_resource(ShowProductDetail, "/product_detail/<int:id>")
+api.add_resource(ShowProductDetail, "/product_detail", "/product_detail/<int:id>")
